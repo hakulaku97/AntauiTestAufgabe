@@ -9,89 +9,129 @@ class Csv implements Driver {
 	{
 	    if(empty($str_database)){
 	        trigger_error('No database base folder given.', E_USER_ERROR);
-	        return null;
 	    }
 	    
 	    if(!file_exists($str_database)){
 	        trigger_error('Given database base folder not there.', E_USER_ERROR);
-	        return null;
 	    }
 	    
 	    if(!is_dir($str_database)){
 	        trigger_error('Given database base folder is not a directory.', E_USER_ERROR);
-	        return null;
 	    }
 	    
 	    $this->setFolder($str_database);
 	}
-	
-	public function buildSelect()
-	{
+
+    /**
+     * Returns a new Select Builder
+     *
+     * @return Csv\Select
+     */
+	public function buildSelect(): Csv\Select
+    {
 	    return new Csv\Select;
 	}
-	
-	public function buildDelete()
-	{
+
+    /**
+     * Returns a new Delete Builder
+     *
+     * @return Csv\Delete
+     */
+	public function buildDelete(): Csv\Delete
+    {
 	    return new Csv\Delete;
 	}
-	
-	public function buildInsert()
-	{
+
+    /**
+     * Returns a new Insert Builder
+     *
+     * @return Csv\Insert
+     */
+	public function buildInsert(): Csv\Insert
+    {
 	    return new Csv\Insert;
 	}
-	
-	public function buildUpdate()
-	{
+
+    /**
+     * Returns a new Update Builder
+     *
+     * @return Csv\Update
+     */
+	public function buildUpdate(): Csv\Update
+    {
 	    return new Csv\Update;
 	}
-	
-	private function fetch(\Test\Database\Query $obj_query, $boo_headOnly=false)
+
+    /**
+     * Fetches entries
+     *
+     * @param Query $obj_query
+     * @param bool $boo_headOnly
+     *
+     * @return array|false|null
+     */
+	private function fetch(Query $obj_query, bool $boo_headOnly=false)
 	{
 	    if(!($obj_query instanceof Csv\Select)){
 	        trigger_error('Invalid argument, expected Test\Database\Csv\Select', E_USER_ERROR);
-	        return false;
 	    }
 	    
 	    $str_from = $obj_query->__from;
 	    
 	    if(empty($str_from)){
 	        trigger_error('Query object missing FROM clause', E_USER_ERROR);
-	        return false;
 	    }
 	    
 	    $str_csvFile = realpath($this->getFolder().DIRECTORY_SEPARATOR.$str_from.'.csv');
 	    if(!file_exists($str_csvFile)){
 	        trigger_error(sprintf('Invalid table object "%s"', $str_from), E_USER_ERROR);
-	        return false;
 	    }
 	    
 	    $arr_head = [];
 	    $arr_data = [];
 	    $i = 0;
+
 	    if(($handle = fopen($str_csvFile, "r")) !== FALSE){
 	        while(($arr_row = fgetcsv($handle, 1000, ",")) !== FALSE){
 	            if(!$i++){
 	                $arr_head = $arr_row;
-	                if($boo_headOnly) return $arr_head;
+
+	                if($boo_headOnly) {
+                        return $arr_head;
+                    }
 	            }
-	            else $arr_data[] = array_combine($arr_head, $arr_row);
+	            else {
+                    $arr_data[] = array_combine($arr_head, $arr_row);
+                }
 	        }
 	        fclose($handle);
 	    }
 	    return $arr_data;
 	}
-	
-	private function validate($arr_row, $arr_wheres=[], $arr_alias=[])
-	{
-	    if(empty($arr_row))
-	        return false;
+
+    /**
+     * Validates if syntax is correct
+     *
+     * @param $arr_row
+     * @param array $arr_wheres
+     * @param array $arr_alias
+     *
+     * @return bool
+     */
+	private function validate($arr_row, array $arr_wheres=[], array $arr_alias=[]): bool
+    {
+	    if(empty($arr_row)) {
+            return false;
+        }
+
 	    $boo_returnResult = true;
-	    foreach($arr_wheres as $arr_where){
-	        foreach($arr_where as $str_andOr => $arr_whereClause){
+	    foreach($arr_wheres as $arr_where) {
+	        foreach($arr_where as $str_andOr => $arr_whereClause) {
 	            $arr_keys = array_keys($arr_whereClause);
 	            $str_col = end($arr_keys);
 	            $str_val = $arr_whereClause[$str_col];
-	            $boo_result = $arr_row[$str_col] == (substr($str_val, 0, 1)===':'?$arr_alias[substr($str_val, 1)]:$str_val);
+	            $boo_result = $arr_row[$str_col] ==
+                    (substr($str_val, 0, 1) === ':'? $arr_alias[substr($str_val, 1)] : $str_val);
 	            
 	            switch($str_andOr){
 	                case 'and':
@@ -105,99 +145,188 @@ class Csv implements Driver {
 	    }
 	    return $boo_returnResult;
 	}
-	
-	public function fetchRow(\Test\Database\Query $obj_query, array $arr_alias=[])
+
+    /**
+     * Fetches a row
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     * @return array|mixed
+     */
+	public function fetchRow(Query $obj_query, array $arr_alias=[])
 	{
 	    $arr_data = $this->fetch($obj_query);
-	    if($arr_data===false) return [];
+	    if(empty($arr_data)) {
+            return [];
+        }
+
 	    
 	    $arr_cols = $obj_query->__cols;
 	    $arr_wheres = $obj_query->__where;
 	    $arr_return = [];
+
 	    foreach($arr_data as $arr_row){
-	        if(!empty($arr_cols))foreach($arr_cols as $str_col)
-	            $arr_return[$str_col] = $arr_row[$str_col];
-            else $arr_return = $arr_row;
-            if(empty($arr_wheres))
+	        if(!empty($arr_cols)) {
+                foreach($arr_cols as $str_col) {
+                    $arr_return[$str_col] = $arr_row[$str_col];
+                }
+            }
+            else {
+                $arr_return = $arr_row;
+            }
+
+            if(empty($arr_wheres)) {
                 return $arr_return;
-            if($this->validate($arr_row, $arr_wheres, $arr_alias))
+            }
+
+            if($this->validate($arr_row, $arr_wheres, $arr_alias))  {
                 return $arr_return;
+            }
 	    }
+
 	    return [];
 	}
-	
-	public function fetchCol(\Test\Database\Query $obj_query, array $arr_alias=[])
-	{
+
+    /**
+     * Fetches a column
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     * @return array
+     */
+	public function fetchCol(Query $obj_query, array $arr_alias=[]): array
+    {
 	    $arr_cols = $obj_query->__cols;
 	    if(empty($arr_cols)){
 	        trigger_error('Expect column to fetch, none given', E_USER_ERROR);
-	        return false;
 	    }
+
 	    $str_col = end($arr_cols);
 	    $arr_data = $this->fetch($obj_query);
-	    if($arr_data===false) return [];
-	    $arr_wheres = $obj_query->__where;
-	    
-	    $arr_return = [];
-	    foreach($arr_data as $arr_row){
-	        if(empty($arr_wheres))
-	           $arr_return[] = $arr_row[$str_col];
-            elseif($this->validate($arr_row, $arr_wheres, $arr_alias))
-                $arr_return[] = $arr_row[$str_col];
+
+	    if($arr_data === false) {
+            return [];
         }
+
+	    $arr_wheres = $obj_query->__where;
+	    $arr_return = [];
+
+	    foreach($arr_data as $arr_row){
+	        if(empty($arr_wheres)) {
+                $arr_return[] = $arr_row[$str_col];
+            }
+            elseif($this->validate($arr_row, $arr_wheres, $arr_alias)) {
+                $arr_return[] = $arr_row[$str_col];
+            }
+        }
+
         return $arr_return;
 	}
-	
-	public function fetchOne(\Test\Database\Query $obj_query, array $arr_alias=[])
+
+    /**
+     * Fetch one entry with the specific conditions
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     *
+     * @return mixed
+     */
+	public function fetchOne(Query $obj_query, array $arr_alias=[])
 	{
 	    $arr_cols = $obj_query->__cols;
+
 	    if(empty($arr_cols)){
 	        trigger_error('Expect column to fetch, none given', E_USER_ERROR);
-	        return false;
+
 	    }
+
 	    $str_col = end($arr_cols);
 	    
 	    return $this->fetchRow($obj_query)[$str_col];
 	}
-	
-	public function fetchAll(\Test\Database\Query $obj_query, array $arr_alias=[])
-	{
+
+    /**
+     * Fetch all entries with the specific conditions
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     *
+     * @return array
+     */
+	public function fetchAll(Query $obj_query, array $arr_alias=[]): array
+    {
 	    $arr_return = $this->fetchAssoc($obj_query, $arr_alias);
-	    if(is_array($arr_return) && !empty($arr_return)){
-	        foreach($arr_return as $i => $arr_row)
-	            $arr_return[$i] = array_merge($arr_row, array_values($arr_row));
+
+	    if(!empty($arr_return)) {
+	        foreach($arr_return as $i => $arr_row) {
+                $arr_return[$i] = array_merge($arr_row, array_values($arr_row));
+            }
 	    }
+
 	    return $arr_return;
 	}
-	
-	public function fetchAssoc(\Test\Database\Query $obj_query, array $arr_alias=[])
-	{
+
+    /**
+     * Fetch with specific conditions
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     *
+     * @return array
+     */
+	public function fetchAssoc(Query $obj_query, array $arr_alias=[]): array
+    {
 	    $arr_data = $this->fetch($obj_query);
-	    if($arr_data===false) return [];
+	    if(empty($arr_data)) {
+            return [];
+        }
 	    
 	    $arr_cols = $obj_query->__cols;
 	    $arr_wheres = $obj_query->__where;
 	    $arr_return = [];
-	    foreach($arr_data as $arr_row){
+
+	    foreach($arr_data as $arr_row) {
 	        $arr_returnRow = [];
-	        if(!empty($arr_cols))foreach($arr_cols as $str_col)
-	            $arr_returnRow[$str_col] = $arr_row[$str_col];
-            else $arr_returnRow = $arr_row;
-            if(empty($arr_wheres))
+
+	        if(!empty($arr_cols)){
+                foreach($arr_cols as $str_col) {
+                    $arr_returnRow[$str_col] = $arr_row[$str_col];
+                }
+            }
+            else {
+                $arr_returnRow = $arr_row;
+            }
+
+            if(empty($arr_wheres)) {
                 $arr_return[] = $arr_returnRow;
-            elseif($this->validate($arr_row, $arr_wheres, $arr_alias))
-                $arr_return[] = $arr_returnRow;;
+            }
+            elseif($this->validate($arr_row, $arr_wheres, $arr_alias)) {
+                $arr_return[] = $arr_returnRow;
+            }
 	    }
+
 	    return $arr_return;
 	}
-	
-	public function execute(\Test\Database\Query $obj_query, array $arr_alias=[])
-	{
+
+    /**
+     * Execute query
+     *
+     * @param Query $obj_query
+     * @param array $arr_alias
+     *
+     * @return bool
+     */
+	public function execute(Query $obj_query, array $arr_alias=[]): bool
+    {
 	    $str_table = $obj_query->__table;
 	    
 	    $arr_data = $this->fetch($this->buildSelect()->from($str_table));
-	    $arr_head = empty($arr_data)?$this->fetch($this->buildSelect()->from($str_table), true):array_keys($arr_data[0]);
-	    if($arr_data === false) return false;
+	    $arr_head = empty($arr_data) ? $this->fetch($this->buildSelect()->from($str_table), true) :
+            array_keys($arr_data[0]);
+
+	    if($arr_data === false) {
+            return false;
+        }
 	    
 	    $str_csvFile = realpath($this->getFolder().DIRECTORY_SEPARATOR.$str_table.'.csv');
 	    $fp = fopen($str_csvFile, 'w');
@@ -221,6 +350,7 @@ class Csv implements Driver {
 
 
     	        }
+
                 fputcsv($fp, $arr_row);
     	    }
         }
@@ -228,40 +358,54 @@ class Csv implements Driver {
 	    if($obj_query instanceof Csv\Delete){
 	        $arr_wheres = $obj_query->__where;
     	    foreach($arr_data as $arr_row){
-    	        if(!$this->validate($arr_row, $arr_wheres, $arr_alias))
+    	        if(!$this->validate($arr_row, $arr_wheres, $arr_alias)) {
                     fputcsv($fp, $arr_row);
+                }
     	    }
         }
 	    
 	    if($obj_query instanceof Csv\Insert){
+            $arr_put = [];
 	        $arr_set = $obj_query->__set;
 	        $id = 0;
+
     	    foreach($arr_data as $arr_row){
                 fputcsv($fp, $arr_row);
                 $id = array_key_exists('id', $arr_row)?max($arr_row['id'], $id):$id;
     	    }
-    	    $arr_put = [];
-    	    if(in_array('id', $arr_head))
-    	        $arr_put['id'] = ++$id;
-	        if(array_key_exists('id', $arr_set))unset($arr_set['id']);
-	        foreach($arr_head as $str_col)
-	            if(array_key_exists($str_col, $arr_set))
-    	            $arr_put[$str_col] = (substr($arr_set[$str_col], 0, 1)===':'?$arr_alias[substr($arr_set[$str_col], 1)]:$arr_set[$str_col]);
-	            else $arr_put[$str_col] = $str_col=='id'?$arr_put[$str_col]:NULL;
+
+    	    if(in_array('id', $arr_head)) {
+                $arr_put['id'] = ++$id;
+            }
+
+	        if(array_key_exists('id', $arr_set)) {
+                unset($arr_set['id']);
+            }
+
+	        foreach($arr_head as $str_col) {
+                if(array_key_exists($str_col, $arr_set)) {
+                    $arr_put[$str_col] = (substr($arr_set[$str_col], 0, 1)  === ':' ?
+                        $arr_alias[substr($arr_set[$str_col], 1)]:$arr_set[$str_col]);
+                }
+                else {
+                    $arr_put[$str_col] = $str_col == 'id' ? $arr_put[$str_col] : NULL;
+                }
+            }
+
 	        fputcsv($fp, $arr_put);
         }
-        
 	    fclose($fp);
+
 	    return true;
 	}
 	
-	private $str_folder;
+	private string $str_folder;
 	
 	/**
 	*    Set the str_folder value
 	*    @param string $str_folder
 	*/
-	private function setFolder($str_folder)
+	private function setFolder(string $str_folder)
 	{
 	    $this->str_folder = $str_folder;
 	}
@@ -270,8 +414,8 @@ class Csv implements Driver {
 	*    Returns the str_folder value.
 	*    @return string
 	*/
-	private function getFolder()
-	{
+	private function getFolder(): string
+    {
 	    return $this->str_folder;
 	}
 }
