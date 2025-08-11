@@ -206,11 +206,20 @@ class Csv implements Driver {
 	    if($obj_query instanceof Csv\Update){
 	        $arr_wheres = $obj_query->__where;
 	        $arr_set = $obj_query->__set;
-	        if(array_key_exists('id', $arr_set))unset($arr_set['id']);
+
+	        if(array_key_exists('id', $arr_set)) {
+                unset($arr_set['id']);
+            }
+
     	    foreach($arr_data as $arr_row){
     	        if($this->validate($arr_row, $arr_wheres, $arr_alias)){
-    	            foreach($arr_set as $str_col => $str_val)if(array_key_exists($str_col, $arr_row))
-    	                $arr_row[$str_col] = (substr($str_val, 0, 1)===':'?$arr_alias[substr($str_val, 1)]:$str_val);
+    	            foreach($arr_set as $str_col => $str_val) {
+                        if(array_key_exists($str_col, $arr_row)) {
+                            $arr_row[$str_col] = (substr($str_val, 0, 1)===':'?$arr_alias[substr($str_val, 1)]:$str_val);
+                        }
+                    }
+
+
     	        }
                 fputcsv($fp, $arr_row);
     	    }
