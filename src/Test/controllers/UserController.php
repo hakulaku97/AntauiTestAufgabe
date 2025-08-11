@@ -5,6 +5,15 @@ use DateTime;
 use Test\models\User;
 
 class UserController {
+
+    /**
+     * Validates if the given credentials are correct
+     *
+     * @param $username
+     * @param $password
+     *
+     * @return array
+     */
     public static function validateLogin($username, $password): array {
         $errors = [];
 
@@ -24,13 +33,13 @@ class UserController {
 
         if ($user[0]['password'] !== $password) {
             $errors[] = "Invalid password";
-            $newFailureCount = ((int) $user[0]['failed']) + 1;
+            $new_failure_count = ((int) $user[0]['failed']) + 1;
 
-            if ($newFailureCount >= 3) {
+            if ($new_failure_count >= 3) {
                 $saved = User::blockUser($user[0]['username']);
 
                 if (!$saved) {
-                    trigger_error('failed to save block for user ', E_USER_WARNING);
+                    trigger_error('failed to save block for user ', E_USER_ERROR);
                 }
 
                 LogController::saveLog([
@@ -42,10 +51,10 @@ class UserController {
                 return $errors;
             }
 
-            $saved = User::updateLoginFailure($user[0]['username'], $newFailureCount);
+            $saved = User::updateLoginFailure($user[0]['username'], $new_failure_count);
 
             if (!$saved) {
-                trigger_error("Could not save failure count");
+                trigger_error("Could not save failure count", E_USER_ERROR);
             }
 
             return $errors;
@@ -54,36 +63,41 @@ class UserController {
         return $errors;
     }
 
+    /**
+     * Gets the data used for the greeting page for the current logged-in User
+     *
+     * @return array
+     */
     public static function getGreetingData(): array {
-        $currentLoginTime = date('Y-m-d H:i:s');
+        $current_login_time = date('Y-m-d H:i:s');
         $username = $_COOKIE['auth_user'];
         $user = User::getUserByName($username);
         $logs = LogController::getLogs($username);
-        $lastLoginTime = $user[0]['lastlogin'];
+        $last_login_time = $user[0]['lastlogin'];
 
         LogController::saveLog([
             'username' => $username,
-            'date' => $currentLoginTime,
+            'date' => $current_login_time,
             'action' => 'login'
         ]);
 
-        $saved = User::updateLastLogin($username, $currentLoginTime);
+        $saved = User::updateLastLogin($username, $current_login_time);
 
         if (!$saved) {
             trigger_error('Unable to update last login', E_USER_ERROR);
         }
 
         try {
-            $elapsedTime = (new DateTime($currentLoginTime))
-                ->diff(new DateTime($lastLoginTime))
+            $elapsed_time = (new DateTime($current_login_time))
+                ->diff(new DateTime($last_login_time))
                 ->format('%a days, %h hours, %i minutes, %s seconds');
         } catch (\Exception $e) {
-            $elapsedTime = "";
+            $elapsed_time = "";
         }
 
         return [
             'username' => $username,
-            'elapsedTime' => $elapsedTime,
+            'elapsed_time' => $elapsed_time,
             'logs' => $logs,
         ];
     }

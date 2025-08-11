@@ -11,7 +11,7 @@ LogController::saveLog([
     'action' => 'logout'
 ]);
 
-ConfigHelper::unsetCookies();
+ConfigHelper::deleteLoginCookies();
 
 header("Location: ../index.php");
 

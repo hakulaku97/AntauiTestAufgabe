@@ -5,9 +5,14 @@ namespace Test\models;
 use Test\Database;
 
 class BaseModel {
+    protected static ?Database\Csv $database;
 
-    protected static $database;
-
+    /**
+     * Returns the database connection.
+     * Shared Connection by all Sub-classes
+     *
+     * @return Database\Csv|null
+     */
     protected static function useDatabase(): ?Database\Csv
     {
         if (!isset(self::$database)) {
