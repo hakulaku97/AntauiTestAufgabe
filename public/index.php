@@ -1,0 +1,57 @@
+<?php
+
+namespace App;
+
+require '../src/autoload.php';
+
+use Test\controllers\UserController;
+use Test\helpers\ConfigHelper;
+
+ConfigHelper::checkForLoginCookie();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    $errors = UserController::validateLogin($username, $password);
+
+    if (empty($errors)) {
+        ConfigHelper::setCookies($username);
+        header('Location: pages/greetingsPage.php');
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="assets/css/theme.css">
+</head>
+<body>
+<div class="login-container">
+    <h2>Login</h2>
+    <?php if (!empty($errors)): ?>
+        <div class="error-list">
+            <?php foreach ($errors as $error): ?>
+                <p class="error"><?php echo htmlspecialchars($error); ?></p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <form id="loginForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        <div class="form-group">
+            <label for="username">Username (user@host.domain)</label>
+            <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</div>
+<script src="assets/js/functions.js"></script>
+</body>
+</html>
