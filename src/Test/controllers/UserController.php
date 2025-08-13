@@ -75,6 +75,12 @@ class UserController {
         $logs = LogController::getLogs($username);
         $last_login_time = $user[0]['lastlogin'];
 
+        /*
+         * In my opinion a login is not only technical but also if the user considers this action as a login even while
+         * already being logged in via cookie.
+         *
+         * Therefore I made the choice to count the revisit while already having cookies set as another login
+         */
         LogController::saveLog([
             'username' => $username,
             'date' => $current_login_time,

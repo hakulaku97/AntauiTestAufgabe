@@ -7,7 +7,10 @@ require '../src/autoload.php';
 use Test\controllers\UserController;
 use Test\helpers\ConfigHelper;
 
-ConfigHelper::checkForLoginCookie();
+ConfigHelper::checkForLoginCookie([
+        'redirect_on_success' => 'Location: pages/greetingsPage.php',
+        'redirect_on_failure' => '',
+]);
 
 // Process the submitted Login Credentials
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

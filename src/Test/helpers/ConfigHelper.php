@@ -29,19 +29,28 @@ class ConfigHelper {
     }
 
     /**
-     * Checks if Login Cookie is already set, if so redirects to Greeting Page
+     * Checks if Login Cookie is already set, if so redirects according to array
+     *
+     * @param array $redirect_paths
      *
      * @return void
      */
-    public static function checkForLoginCookie() {
+    public static function checkForLoginCookie(array $redirect_paths) {
+        $redirect_path = $redirect_paths['redirect_on_failure'];
+
         if (isset($_COOKIE['auth_token']) && isset($_COOKIE['auth_user'])) {
             $token = $_COOKIE['auth_token'];
             $username = $_COOKIE['auth_user'];
             $expected_token = hash('sha256', $username . SECRET_KEY);
+
             if ($token === $expected_token) {
-                header("Location: pages/greetingsPage.php");
-                exit;
+                $redirect_path = $redirect_paths['redirect_on_success'];
             }
+        }
+
+        if (!empty($redirect_path)) {
+            header($redirect_path);
+            exit;
         }
     }
 }

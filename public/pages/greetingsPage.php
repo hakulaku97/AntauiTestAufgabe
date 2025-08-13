@@ -3,6 +3,13 @@ namespace App;
 require '../../src/autoload.php';
 
 use Test\controllers\UserController;
+use Test\helpers\ConfigHelper;
+
+ConfigHelper::checkForLoginCookie([
+        'redirect_on_success' => '',
+        'redirect_on_failure' => 'Location: ../index.php',
+]);
+
 
 $greeting_data = UserController::getGreetingData();
 ?>
