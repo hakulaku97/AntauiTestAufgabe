@@ -72,7 +72,7 @@ class UserController {
         $current_login_time = date('Y-m-d H:i:s');
         $username = $_COOKIE['auth_user'];
         $user = User::getUserByName($username);
-        $logs = LogController::getLogs($username);
+        $logs = LogController::getLogsWithPagination($username, 1, 10);
         $last_login_time = $user[0]['lastlogin'];
 
         /*

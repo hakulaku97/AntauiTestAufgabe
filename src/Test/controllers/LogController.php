@@ -20,13 +20,14 @@ class LogController {
     }
 
     /**
-     * Gets all logs for a specific User
+     * Gets paginated logs for a specific User
      *
-     * @param $username
-     *
+     * @param string $username
+     * @param int $page
+     * @param int $perPage
      * @return array
      */
-    public static function getLogs($username): array {
-        return Log::getLogsForUser($username);
+    public static function getLogsWithPagination(string $username, int $page, int $perPage): array {
+        return Log::getLogsForUser($username, $page, $perPage);
     }
 }

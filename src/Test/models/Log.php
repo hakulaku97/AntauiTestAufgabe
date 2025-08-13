@@ -5,17 +5,18 @@ class Log extends BaseModel {
     /**
      * Gets all Logs for a specific User
      *
-     * @param $username
-     *
+     * @param string $username
+     * @param int $page
+     * @param int $perPage
      * @return array
      */
-    public static function getLogsForUser($username): array {
+    public static function getLogsForUser(string $username, int $page, int $perPage): array {
         $query = self::useDatabase()
             ->buildSelect()
             ->from('log')
             ->where('username', $username);
 
-        return self::useDatabase()->fetchAll($query);
+        return self::useDatabase()->fetchAll($query, [], $page, $perPage);
     }
 
     /**

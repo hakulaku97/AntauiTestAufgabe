@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Login</title>
-    <link rel='stylesheet' href='assets/css/theme.css'>
+    <link rel='stylesheet' href='assets/css/loginTheme.css'>
 </head>
 <body>
 <div class='login-div'>
@@ -50,7 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form id='login-form' method='POST' action='<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>'>
         <div class='form-group'>
             <label for='username'>Username (user@host.domain)</label>
-            <input type='text' id='username' name='username' value='<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>'>
+            <input type='text' id='username' name='username' value='<?php echo isset($_POST['username']) ?
+                    htmlspecialchars($_POST['username']) : ''; ?>'
+            >
         </div>
         <div class='form-div'>
             <label for='password'>Password</label>
@@ -59,6 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type='submit'>Login</button>
     </form>
 </div>
-<script src='assets/js/functions.js'></script>
+<script src='assets/js/clientSideLoginValidation.js'></script>
 </body>
 </html>

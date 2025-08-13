@@ -2,6 +2,7 @@
 namespace Test\Database;
 
 class Csv implements Driver {
+    private string $str_folder;
     
     use Traits\Quote;
     
@@ -21,6 +22,24 @@ class Csv implements Driver {
 	    
 	    $this->setFolder($str_database);
 	}
+
+    /**
+     *    Set the str_folder value
+     *    @param string $str_folder
+     */
+    public function setFolder(string $str_folder)
+    {
+        $this->str_folder = $str_folder;
+    }
+
+    /**
+     *    Returns the str_folder value.
+     *    @return string
+     */
+    public function getFolder(): string
+    {
+        return $this->str_folder;
+    }
 
     /**
      * Returns a new Select Builder
@@ -60,90 +79,6 @@ class Csv implements Driver {
 	public function buildUpdate(): Csv\Update
     {
 	    return new Csv\Update;
-	}
-
-    /**
-     * Fetches entries
-     *
-     * @param Query $obj_query
-     * @param bool $boo_headOnly
-     *
-     * @return array|false|null
-     */
-	private function fetch(Query $obj_query, bool $boo_headOnly=false)
-	{
-	    if(!($obj_query instanceof Csv\Select)){
-	        trigger_error('Invalid argument, expected Test\Database\Csv\Select', E_USER_ERROR);
-	    }
-	    
-	    $str_from = $obj_query->__from;
-	    
-	    if(empty($str_from)){
-	        trigger_error('Query object missing FROM clause', E_USER_ERROR);
-	    }
-	    
-	    $str_csvFile = realpath($this->getFolder().DIRECTORY_SEPARATOR.$str_from.'.csv');
-	    if(!file_exists($str_csvFile)){
-	        trigger_error(sprintf('Invalid table object "%s"', $str_from), E_USER_ERROR);
-	    }
-	    
-	    $arr_head = [];
-	    $arr_data = [];
-	    $i = 0;
-
-	    if(($handle = fopen($str_csvFile, "r")) !== FALSE){
-	        while(($arr_row = fgetcsv($handle, 1000, ",")) !== FALSE){
-	            if(!$i++){
-	                $arr_head = $arr_row;
-
-	                if($boo_headOnly) {
-                        return $arr_head;
-                    }
-	            }
-	            else {
-                    $arr_data[] = array_combine($arr_head, $arr_row);
-                }
-	        }
-	        fclose($handle);
-	    }
-	    return $arr_data;
-	}
-
-    /**
-     * Validates if syntax is correct
-     *
-     * @param $arr_row
-     * @param array $arr_wheres
-     * @param array $arr_alias
-     *
-     * @return bool
-     */
-	private function validate($arr_row, array $arr_wheres=[], array $arr_alias=[]): bool
-    {
-	    if(empty($arr_row)) {
-            return false;
-        }
-
-	    $boo_returnResult = true;
-	    foreach($arr_wheres as $arr_where) {
-	        foreach($arr_where as $str_andOr => $arr_whereClause) {
-	            $arr_keys = array_keys($arr_whereClause);
-	            $str_col = end($arr_keys);
-	            $str_val = $arr_whereClause[$str_col];
-	            $boo_result = $arr_row[$str_col] ==
-                    (substr($str_val, 0, 1) === ':'? $arr_alias[substr($str_val, 1)] : $str_val);
-	            
-	            switch($str_andOr){
-	                case 'and':
-	                    $boo_returnResult = $boo_returnResult && $boo_result;
-	                    break;
-	                case 'or':
-	                    $boo_returnResult = $boo_returnResult || $boo_result;
-	                    break;
-	            }
-	        }
-	    }
-	    return $boo_returnResult;
 	}
 
     /**
@@ -246,25 +181,46 @@ class Csv implements Driver {
 	}
 
     /**
-     * Fetch all entries with the specific conditions
+     * Fetch all entries with the specific conditions, with optional pagination
      *
      * @param Query $obj_query
      * @param array $arr_alias
+     * @param int|null $page Page number, null for no pagination
+     * @param int|null $perPage Number of records per page, null for no pagination
      *
-     * @return array
+     * @return array ['data' => array, 'totalPages' => int]
      */
-	public function fetchAll(Query $obj_query, array $arr_alias=[]): array
+    public function fetchAll(Query $obj_query, array $arr_alias = [], ?int $page = null, ?int $perPage = null): array
     {
-	    $arr_return = $this->fetchAssoc($obj_query, $arr_alias);
+        $arr_return = $this->fetchAssoc($obj_query, $arr_alias);
+        $total_records = count($arr_return);
+        $total_pages = 0;
 
-	    if(!empty($arr_return)) {
-	        foreach($arr_return as $i => $arr_row) {
+        if (is_int($perPage) && $perPage > 0) {
+            $total_pages = (int) ceil($total_records / $perPage);
+        } elseif ($total_records > 0) {
+            $total_pages = 1;
+        }
+
+        if (!empty($arr_return)) {
+            if (is_int($page) && is_int($perPage) && $page > 0 && $perPage > 0) {
+                $start = ($page - 1) * $perPage;
+                $arr_return = array_slice($arr_return, $start, $perPage);
+            } elseif (($page !== null && $page <= 0) || ($perPage !== null && $perPage <= 0)) {
+                trigger_error('Invalid pagination parameters', E_USER_WARNING);
+                $arr_return = [];
+            }
+
+            foreach ($arr_return as $i => $arr_row) {
                 $arr_return[$i] = array_merge($arr_row, array_values($arr_row));
             }
-	    }
+        }
 
-	    return $arr_return;
-	}
+        return [
+            'data' => $arr_return,
+            'total_pages' => $total_pages
+        ];
+    }
 
     /**
      * Fetch with specific conditions
@@ -398,24 +354,88 @@ class Csv implements Driver {
 
 	    return true;
 	}
-	
-	private string $str_folder;
-	
-	/**
-	*    Set the str_folder value
-	*    @param string $str_folder
-	*/
-	private function setFolder(string $str_folder)
-	{
-	    $this->str_folder = $str_folder;
-	}
-	
-	/**
-	*    Returns the str_folder value.
-	*    @return string
-	*/
-	private function getFolder(): string
+
+    /**
+     * Fetches entries
+     *
+     * @param Query $obj_query
+     * @param bool $boo_headOnly
+     *
+     * @return array|false|null
+     */
+    private function fetch(Query $obj_query, bool $boo_headOnly=false)
     {
-	    return $this->str_folder;
-	}
+        if(!($obj_query instanceof Csv\Select)){
+            trigger_error('Invalid argument, expected Test\Database\Csv\Select', E_USER_ERROR);
+        }
+
+        $str_from = $obj_query->__from;
+
+        if(empty($str_from)){
+            trigger_error('Query object missing FROM clause', E_USER_ERROR);
+        }
+
+        $str_csvFile = realpath($this->getFolder().DIRECTORY_SEPARATOR.$str_from.'.csv');
+        if(!file_exists($str_csvFile)){
+            trigger_error(sprintf('Invalid table object "%s"', $str_from), E_USER_ERROR);
+        }
+
+        $arr_head = [];
+        $arr_data = [];
+        $i = 0;
+
+        if(($handle = fopen($str_csvFile, "r")) !== FALSE){
+            while(($arr_row = fgetcsv($handle, 1000, ",")) !== FALSE){
+                if(!$i++){
+                    $arr_head = $arr_row;
+
+                    if($boo_headOnly) {
+                        return $arr_head;
+                    }
+                }
+                else {
+                    $arr_data[] = array_combine($arr_head, $arr_row);
+                }
+            }
+            fclose($handle);
+        }
+        return $arr_data;
+    }
+
+    /**
+     * Validates if syntax is correct
+     *
+     * @param $arr_row
+     * @param array $arr_wheres
+     * @param array $arr_alias
+     *
+     * @return bool
+     */
+    private function validate($arr_row, array $arr_wheres=[], array $arr_alias=[]): bool
+    {
+        if(empty($arr_row)) {
+            return false;
+        }
+
+        $boo_returnResult = true;
+        foreach($arr_wheres as $arr_where) {
+            foreach($arr_where as $str_andOr => $arr_whereClause) {
+                $arr_keys = array_keys($arr_whereClause);
+                $str_col = end($arr_keys);
+                $str_val = $arr_whereClause[$str_col];
+                $boo_result = $arr_row[$str_col] ==
+                    (substr($str_val, 0, 1) === ':'? $arr_alias[substr($str_val, 1)] : $str_val);
+
+                switch($str_andOr){
+                    case 'and':
+                        $boo_returnResult = $boo_returnResult && $boo_result;
+                        break;
+                    case 'or':
+                        $boo_returnResult = $boo_returnResult || $boo_result;
+                        break;
+                }
+            }
+        }
+        return $boo_returnResult;
+    }
 }
