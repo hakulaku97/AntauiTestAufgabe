@@ -98,7 +98,7 @@ class UserController {
                 ->diff(new DateTime($last_login_time))
                 ->format('%a days, %h hours, %i minutes, %s seconds');
         } catch (\Exception $e) {
-            $elapsed_time = "";
+            $elapsed_time = "Undefined";
         }
 
         return [

@@ -6,6 +6,9 @@ require '../src/autoload.php';
 
 use Test\controllers\UserController;
 use Test\helpers\ConfigHelper;
+use Test\helpers\SecurityHelper;
+
+define('SALT_KEY', SecurityHelper::getSaltKeyFromEnvironment());
 
 ConfigHelper::checkForLoginCookie([
         'redirect_on_success' => 'Location: pages/greetingsPage.php',
@@ -13,7 +16,7 @@ ConfigHelper::checkForLoginCookie([
 ]);
 
 // Process the submitted Login Credentials
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 

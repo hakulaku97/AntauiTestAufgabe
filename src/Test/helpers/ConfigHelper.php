@@ -1,9 +1,6 @@
 <?php
 namespace Test\helpers;
 
-// Secret key for token generation (in production, store this securely)
-define('SECRET_KEY', 'your_secure_secret_key_123');
-
 class ConfigHelper {
     /**
      * Sets Login Cookies
@@ -13,7 +10,7 @@ class ConfigHelper {
      * @return void
      */
     public static function setLoginCookies($username) {
-        $token = hash('sha256', $username . SECRET_KEY);
+        $token = hash('sha256', $username . SALT_KEY);
         setcookie('auth_token', $token, time() + 86400, "/", "", false, true);
         setcookie('auth_user', $username, time() + 86400, "/", "", false, true);
     }
@@ -41,7 +38,7 @@ class ConfigHelper {
         if (isset($_COOKIE['auth_token']) && isset($_COOKIE['auth_user'])) {
             $token = $_COOKIE['auth_token'];
             $username = $_COOKIE['auth_user'];
-            $expected_token = hash('sha256', $username . SECRET_KEY);
+            $expected_token = hash('sha256', $username . SALT_KEY);
 
             if ($token === $expected_token) {
                 $redirect_path = $redirect_paths['redirect_on_success'];

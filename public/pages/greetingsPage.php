@@ -4,6 +4,10 @@ require '../../src/autoload.php';
 
 use Test\controllers\UserController;
 use Test\helpers\ConfigHelper;
+use Test\helpers\SecurityHelper;
+
+define('SALT_KEY', SecurityHelper::getSaltKeyFromEnvironment());
+
 
 ConfigHelper::checkForLoginCookie([
         'redirect_on_success' => '',
@@ -25,7 +29,7 @@ $greeting_data = UserController::getGreetingData();
 <body>
 <div class='greeting-div'>
     <h2>Hello, <?php echo htmlspecialchars($greeting_data['username']); ?>!</h2>
-    <h2>Time elapsed since last login: <?php echo $greeting_data['elapsedTime']; ?></h2>
+    <h2>Time elapsed since last login: <?php echo $greeting_data['elapsed_time']; ?></h2>
     <h3>Your Activity</h3>
     <table class='log-table'>
         <thead>
