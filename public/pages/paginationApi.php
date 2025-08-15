@@ -1,4 +1,7 @@
 <?php
+/*
+ * This File contains the API code for the pagination of the user action logs
+ */
 namespace App;
 require '../../src/autoload.php';
 
@@ -11,9 +14,8 @@ header('Content-Type: application/json');
 
 $username = $_COOKIE['auth_user'];
 $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-$perPage = 10;
 
-$logs = LogController::getLogsWithPagination($username, $page, $perPage);
+$logs = LogController::getLogsWithPagination($username, $page, 10);
 
 echo json_encode([
     'data' => $logs['data'],

@@ -6,7 +6,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
         /^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/;
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    let errors= [];
+    const errors= [];
 
     if (!username) {
         errors.push('Username is required');

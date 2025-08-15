@@ -9,7 +9,7 @@ body {
     color: #ffffff;
 }
 
-.login-container {
+.login-div {
     background: #6d6d6d;
     padding: 2rem;
     border-radius: 8px;
@@ -23,7 +23,7 @@ h2 {
     color: #ffffff;
 }
 
-.form-group {
+.form-div {
     margin-bottom: 1rem;
 }
 

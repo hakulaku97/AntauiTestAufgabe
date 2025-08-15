@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 require '../src/autoload.php';
@@ -8,6 +7,7 @@ use Test\controllers\UserController;
 use Test\helpers\ConfigHelper;
 use Test\helpers\SecurityHelper;
 
+// define the SALT_KEY as global variable
 define('SALT_KEY', SecurityHelper::getSaltKeyFromEnvironment());
 
 ConfigHelper::checkForLoginCookie([
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
     <form id='login-form' method='POST' action='<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>'>
-        <div class='form-group'>
+        <div class='form-div'>
             <label for='username'>Username (user@host.domain)</label>
             <input type='text' id='username' name='username' value='<?php echo isset($_POST['username']) ?
                     htmlspecialchars($_POST['username']) : ''; ?>'

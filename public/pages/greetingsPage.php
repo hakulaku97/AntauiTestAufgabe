@@ -8,12 +8,10 @@ use Test\helpers\SecurityHelper;
 
 define('SALT_KEY', SecurityHelper::getSaltKeyFromEnvironment());
 
-
 ConfigHelper::checkForLoginCookie([
         'redirect_on_success' => '',
         'redirect_on_failure' => 'Location: ../index.php',
 ]);
-
 
 $greeting_data = UserController::getGreetingData();
 $data = $greeting_data['logs']['data'];
@@ -72,8 +70,8 @@ $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ?
             Next
         </a>
     </div>
-    <div class='form-container'>
-        <form action='logoutHelper.php' method='POST'>
+    <div class='logout-div'>
+        <form action='logout.php' method='POST'>
             <button type='submit' class='logout-button'>Logout</button>
         </form>
     </div>

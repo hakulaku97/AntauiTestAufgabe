@@ -5,7 +5,6 @@
  * @param callback
  */
 function makeAjaxRequest(url, callback) {
-    console.log('Fetching URL:', url);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onreadystatechange = function() {
@@ -15,11 +14,9 @@ function makeAjaxRequest(url, callback) {
                     const response = JSON.parse(xhr.responseText);
                     callback(null, response);
                 } catch (e) {
-                    console.error('JSON parse error:', e, xhr.responseText);
                     callback(new Error('JSON parse error'));
                 }
             } else {
-                console.error('AJAX error:', xhr.status, xhr.statusText);
                 callback(new Error('HTTP ' + xhr.status));
             }
         }
@@ -70,8 +67,8 @@ function updateTable(tableBody, emptyLogs, data, currentPage, headers) {
  * @param handlePageClick
  */
 function updatePagination(pagination, currentPage, totalPages, data, handlePageClick) {
-    pagination.innerHTML = '';
     const prev = document.createElement('a');
+    pagination.innerHTML = '';
     prev.textContent = 'Previous';
     prev.setAttribute('data-page', String(currentPage - 1));
 
@@ -115,7 +112,7 @@ function handlePageClick(event) {
 }
 
 /**
- * Fetches and gets teh state of the page number
+ * Fetches and gets the state of the page number
  *
  * @param event
  * @param fetchPage

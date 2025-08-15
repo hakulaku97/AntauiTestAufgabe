@@ -1,4 +1,7 @@
 <?php
+/*
+ * This code contains the logout functionality that is called after clicking teh logout button
+ */
 namespace App;
 require '../../src/autoload.php';
 

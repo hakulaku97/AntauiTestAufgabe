@@ -20,19 +20,19 @@ class UserController {
         $user = User::getUserByName($username);
 
         if (empty($user)) {
-            $errors[] = "Invalid username";
+            $errors[] = "Username was not found in the database";
 
             return $errors;
         }
 
         if ($user[0]['blocked'] === '1') {
-            $errors[] = "User as blocked due to 3 failed login attempts";
+            $errors[] = "User was blocked due to 3 failed login attempts";
 
             return $errors;
         }
 
         if ($user[0]['password'] !== $password) {
-            $errors[] = "Invalid password";
+            $errors[] = "Invalid password for User {$username}";
             $new_failure_count = ((int) $user[0]['failed']) + 1;
 
             if ($new_failure_count >= 3) {
