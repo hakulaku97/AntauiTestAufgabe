@@ -6,8 +6,10 @@ trait Where {
 
     /**
      * add value to arr_where as and
+     *
      * @param string $str_col
      * @param string $str_value
+     *
      * @return Where
      */
     public function where(string $str_col, string $str_value): self
@@ -19,8 +21,10 @@ trait Where {
 
     /**
      * add value to arr_where as or
+     *
      * @param string $str_col
      * @param string $str_value
+     *
      * @return Where
      */
     public function orWhere(string $str_col, string $str_value): self
@@ -29,11 +33,12 @@ trait Where {
 
         return $this;
     }
-    
-    
+
+
     /**
-     *    Returns the arr_where value
-     *    @return array
+     * Returns the arr_where value
+     *
+     * @return array
      */
     protected function getWhere(): array
     {

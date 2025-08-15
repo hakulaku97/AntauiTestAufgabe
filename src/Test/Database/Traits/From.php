@@ -6,7 +6,9 @@ trait From {
 
     /**
      * Set the str_from value
+     *
      * @param string $str_from
+     *
      * @return From
      */
     public function from(string $str_from): self
@@ -18,6 +20,7 @@ trait From {
     
     /**
      * Get the str_from value
+     *
      * @return string
      */
     protected function getFrom(): string

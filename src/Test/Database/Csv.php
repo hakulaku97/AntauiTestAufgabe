@@ -30,8 +30,9 @@ class Csv implements Driver {
 	}
 
     /**
-     *    Set the str_folder value
-     *    @param string $str_folder
+     * Set the str_folder value
+     *
+     * @param string $str_folder
      */
     public function setFolder(string $str_folder): void
     {
@@ -39,8 +40,9 @@ class Csv implements Driver {
     }
 
     /**
-     *    Returns the str_folder value.
-     *    @return string
+     * Returns the str_folder value.
+     *
+     * @return string
      */
     public function getFolder(): string
     {
@@ -92,6 +94,7 @@ class Csv implements Driver {
      *
      * @param Query $obj_query
      * @param array $arr_alias
+     *
      * @return array|mixed
      */
 	public function fetchRow(Query $obj_query, array $arr_alias=[])
@@ -133,6 +136,7 @@ class Csv implements Driver {
      *
      * @param Query $obj_query
      * @param array $arr_alias
+     *
      * @return array
      */
 	public function fetchCol(Query $obj_query, array $arr_alias=[]): array

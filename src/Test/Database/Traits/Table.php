@@ -6,7 +6,9 @@ trait Table {
 
     /**
      * Set the str_table value
+     *
      * @param string $str_table
+     *
      * @return Table
      */
     public function table(string $str_table): self
@@ -15,7 +17,7 @@ trait Table {
 
         return $this;
     }
-    
+
     /**
     *    Returns the str_table value.
     *    @return string

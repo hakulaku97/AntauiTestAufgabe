@@ -7,11 +7,11 @@ class LogController {
     /**
      * Saves Log data as a new row
      *
-     * @param $log
+     * @param array $log
      *
      * @return void
      */
-    public static function saveLog($log) {
+    public static function saveLog(array $log) {
         $saved = Log::insertLog($log);
 
         if (!$saved) {
@@ -24,10 +24,11 @@ class LogController {
      *
      * @param string $username
      * @param int $page
-     * @param int $perPage
+     * @param int $per_page
+     *
      * @return array
      */
-    public static function getLogsWithPagination(string $username, int $page, int $perPage): array {
-        return Log::getLogsForUser($username, $page, $perPage);
+    public static function getLogsWithPagination(string $username, int $page, int $per_page): array {
+        return Log::getLogsForUser($username, $page, $per_page);
     }
 }

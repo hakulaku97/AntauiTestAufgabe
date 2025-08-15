@@ -6,7 +6,9 @@ trait Cols {
 
     /**
      * Add value to arr_cols
+     *
      * @param string $str_cols
+     *
      * @return Cols
      */
     public function col(string $str_cols): self
@@ -18,6 +20,7 @@ trait Cols {
 
     /**
      * Set the arr_cols value
+     *
      * @param array $arr_cols
      *
      * @return Cols
@@ -31,6 +34,7 @@ trait Cols {
     
     /**
      * Get the arr_cols value
+     *
      * @return array
      */
     protected function getCols(): array
