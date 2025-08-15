@@ -5,25 +5,27 @@ trait Cols {
     private array $arr_cols=[];
 
     /**
-     *    Add value to arr_cols
+     * Add value to arr_cols
      * @param string $str_cols
      * @return Cols
      */
-    public function col(string $str_cols): Cols
+    public function col(string $str_cols): self
     {
         $this->arr_cols[] = $str_cols;
+
         return $this;
     }
 
     /**
-     *    Set the arr_cols value
+     * Set the arr_cols value
      * @param array $arr_cols
      *
      * @return Cols
      */
-    public function cols(array $arr_cols): Cols
+    public function cols(array $arr_cols): self
     {
         $this->arr_cols = $arr_cols;
+
         return $this;
     }
     

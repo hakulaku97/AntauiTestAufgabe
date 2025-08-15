@@ -10,9 +10,10 @@ trait Set {
      * @param string $str_value
      * @return Set
      */
-    public function set(string $str_col, string $str_value): Set
+    public function set(string $str_col, string $str_value): self
     {
         $this->arr_set[$str_col] = $str_value;
+
         return $this;
     }
     

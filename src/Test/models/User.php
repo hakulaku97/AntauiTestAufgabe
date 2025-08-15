@@ -6,11 +6,11 @@ class User extends BaseModel {
     /**
      * Gets a user by name
      *
-     * @param $username
+     * @param string $username
      *
      * @return array
      */
-    public static function getUserByName($username): array
+    public static function getUserByName(string $username): array
     {
         $query = self::useDatabase()
             ->buildSelect()
@@ -23,12 +23,13 @@ class User extends BaseModel {
     /**
      * Updates the failed Login Counter for a specific User
      *
-     * @param $username
-     * @param $value
+     * @param string $username
+     * @param string $value
      *
      * @return bool
      */
-    public static function updateLoginFailure($username, $value): bool {
+    public static function updateLoginFailure(string $username, string $value): bool
+    {
         $query = self::useDatabase()
             ->buildUpdate()
             ->set('failed', $value)
@@ -41,12 +42,17 @@ class User extends BaseModel {
     /**
      * Updates the last login date for a specific User
      *
-     * @param $username
-     * @param $value
+     * @param string $username
+     * @param string|false $value
      *
      * @return bool
      */
-    public static function updateLastLogin($username, $value): bool {
+    public static function updateLastLogin(string $username, $value): bool
+    {
+        if (!$value) {
+            return false;
+        }
+
         $query = self::useDatabase()
             ->buildUpdate()
             ->set('lastlogin', $value)
@@ -59,11 +65,12 @@ class User extends BaseModel {
     /**
      * Blocks the login for a specific User
      *
-     * @param $username
+     * @param string $username
      *
      * @return bool
      */
-    public static function blockUser($username): bool {
+    public static function blockUser(string $username): bool
+    {
         $query = self::useDatabase()
             ->buildUpdate()
             ->set('blocked', '1')

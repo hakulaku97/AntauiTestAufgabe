@@ -3,22 +3,23 @@
 namespace Test\models;
 
 use Test\Database;
+use Test\Database\Csv;
 
 class BaseModel {
-    protected static ?Database\Csv $database;
+    protected static ?Csv $database;
 
     /**
      * Returns the database connection.
      * Shared Connection by all Sub-classes
      *
-     * @return Database\Csv|null
+     * @return Csv|null
      */
-    protected static function useDatabase(): ?Database\Csv
+    protected static function useDatabase(): ?Csv
     {
         if (!isset(self::$database)) {
             $str_driver = 'csv';
             $str_host = str_replace('\\', '/', realpath(__DIR__.'/../../../data'));
-            $str_dsn = sprintf('%s:/%s', $str_driver, $str_host);
+            $str_dsn = sprintf('%s://%s', $str_driver, $str_host);
             self::$database = Database::factory($str_dsn);
         }
 

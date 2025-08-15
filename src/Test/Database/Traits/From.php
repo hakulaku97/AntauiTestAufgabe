@@ -9,9 +9,10 @@ trait From {
      * @param string $str_from
      * @return From
      */
-    public function from(string $str_from): From
+    public function from(string $str_from): self
     {
         $this->str_from = $str_from;
+
         return $this;
     }
     

@@ -7,16 +7,18 @@ class Log extends BaseModel {
      *
      * @param string $username
      * @param int $page
-     * @param int $perPage
+     * @param int $per_page
+     *
      * @return array
      */
-    public static function getLogsForUser(string $username, int $page, int $perPage): array {
+    public static function getLogsForUser(string $username, int $page, int $per_page): array
+    {
         $query = self::useDatabase()
             ->buildSelect()
             ->from('log')
             ->where('username', $username);
 
-        return self::useDatabase()->fetchAll($query, [], $page, $perPage);
+        return self::useDatabase()->fetchAll($query, [], $page, $per_page);
     }
 
     /**
@@ -26,7 +28,8 @@ class Log extends BaseModel {
      *
      * @return bool
      */
-    public static function insertLog(array $log): bool {
+    public static function insertLog(array $log): bool
+    {
         $query = self::useDatabase()
             ->buildInsert()
             ->table('log');

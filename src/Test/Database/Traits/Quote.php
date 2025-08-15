@@ -2,7 +2,15 @@
 namespace Test\Database\Traits;
 
 trait Quote {
-    public function quote($msc_value, $str_type='')
+    /**
+     * Casts $msc_value based on $str_type
+     *
+     * @param $msc_value
+     * @param string $str_type
+     *
+     * @return bool|float|int|string|void
+     */
+    public function quote($msc_value, string $str_type = '')
     {
         switch(strtolower($str_type)){
             case 'int':

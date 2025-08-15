@@ -7,14 +7,14 @@ use Test\models\User;
 class UserController {
 
     /**
-     * Validates if the given credentials are correct
+     * Validates if the given credentials are correct or not
      *
-     * @param $username
-     * @param $password
+     * @param string $username
+     * @param string $password
      *
      * @return array
      */
-    public static function validateLogin($username, $password): array {
+    public static function validateLogin(string $username, string $password): array {
         $errors = [];
 
         $user = User::getUserByName($username);
@@ -51,7 +51,7 @@ class UserController {
                 return $errors;
             }
 
-            $saved = User::updateLoginFailure($user[0]['username'], $new_failure_count);
+            $saved = User::updateLoginFailure($user[0]['username'], (string) $new_failure_count);
 
             if (!$saved) {
                 trigger_error("Could not save failure count", E_USER_ERROR);

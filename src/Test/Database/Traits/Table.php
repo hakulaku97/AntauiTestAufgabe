@@ -9,9 +9,10 @@ trait Table {
      * @param string $str_table
      * @return Table
      */
-    public function table(string $str_table): Table
+    public function table(string $str_table): self
     {
         $this->str_table = $str_table;
+
         return $this;
     }
     

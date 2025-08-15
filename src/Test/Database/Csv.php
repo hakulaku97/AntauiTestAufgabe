@@ -1,12 +1,18 @@
 <?php 
 namespace Test\Database;
 
+use Test\Database\Traits\Quote;
+use Test\Database\Csv\Select;
+use Test\Database\Csv\Delete;
+use Test\Database\Csv\Insert;
+use Test\Database\Csv\Update;
+
 class Csv implements Driver {
+    use Quote;
+
     private string $str_folder;
-    
-    use Traits\Quote;
-    
-	public function __construct($str_database='')
+
+	public function __construct(string $str_database = '')
 	{
 	    if(empty($str_database)){
 	        trigger_error('No database base folder given.', E_USER_ERROR);
@@ -27,7 +33,7 @@ class Csv implements Driver {
      *    Set the str_folder value
      *    @param string $str_folder
      */
-    public function setFolder(string $str_folder)
+    public function setFolder(string $str_folder): void
     {
         $this->str_folder = $str_folder;
     }
@@ -44,41 +50,41 @@ class Csv implements Driver {
     /**
      * Returns a new Select Builder
      *
-     * @return Csv\Select
+     * @return Select
      */
-	public function buildSelect(): Csv\Select
+	public function buildSelect(): Select
     {
-	    return new Csv\Select;
+	    return new Select;
 	}
 
     /**
      * Returns a new Delete Builder
      *
-     * @return Csv\Delete
+     * @return Delete
      */
-	public function buildDelete(): Csv\Delete
+	public function buildDelete(): Delete
     {
-	    return new Csv\Delete;
+	    return new Delete;
 	}
 
     /**
      * Returns a new Insert Builder
      *
-     * @return Csv\Insert
+     * @return Insert
      */
-	public function buildInsert(): Csv\Insert
+	public function buildInsert(): Insert
     {
-	    return new Csv\Insert;
+	    return new Insert;
 	}
 
     /**
      * Returns a new Update Builder
      *
-     * @return Csv\Update
+     * @return Update
      */
-	public function buildUpdate(): Csv\Update
+	public function buildUpdate(): Update
     {
-	    return new Csv\Update;
+	    return new Update;
 	}
 
     /**
@@ -186,27 +192,27 @@ class Csv implements Driver {
      * @param Query $obj_query
      * @param array $arr_alias
      * @param int|null $page Page number, null for no pagination
-     * @param int|null $perPage Number of records per page, null for no pagination
+     * @param int|null $per_page Number of records per page, null for no pagination
      *
-     * @return array ['data' => array, 'totalPages' => int]
+     * @return array ['data' => array, 'total_pages' => int]
      */
-    public function fetchAll(Query $obj_query, array $arr_alias = [], ?int $page = null, ?int $perPage = null): array
+    public function fetchAll(Query $obj_query, array $arr_alias = [], ?int $page = null, ?int $per_page = null): array
     {
         $arr_return = $this->fetchAssoc($obj_query, $arr_alias);
         $total_records = count($arr_return);
         $total_pages = 0;
 
-        if (is_int($perPage) && $perPage > 0) {
-            $total_pages = (int) ceil($total_records / $perPage);
+        if (is_int($per_page) && $per_page > 0) {
+            $total_pages = (int) ceil($total_records / $per_page);
         } elseif ($total_records > 0) {
             $total_pages = 1;
         }
 
         if (!empty($arr_return)) {
-            if (is_int($page) && is_int($perPage) && $page > 0 && $perPage > 0) {
-                $start = ($page - 1) * $perPage;
-                $arr_return = array_slice($arr_return, $start, $perPage);
-            } elseif (($page !== null && $page <= 0) || ($perPage !== null && $perPage <= 0)) {
+            if (is_int($page) && is_int($per_page) && $page > 0 && $per_page > 0) {
+                $start = ($page - 1) * $per_page;
+                $arr_return = array_slice($arr_return, $start, $per_page);
+            } elseif (($page !== null && $page <= 0) || ($per_page !== null && $per_page <= 0)) {
                 trigger_error('Invalid pagination parameters', E_USER_WARNING);
                 $arr_return = [];
             }
@@ -288,7 +294,7 @@ class Csv implements Driver {
 	    $fp = fopen($str_csvFile, 'w');
 	    fputcsv($fp, $arr_head);
 	    
-	    if($obj_query instanceof Csv\Update){
+	    if($obj_query instanceof Update){
 	        $arr_wheres = $obj_query->__where;
 	        $arr_set = $obj_query->__set;
 
@@ -311,7 +317,7 @@ class Csv implements Driver {
     	    }
         }
 	    
-	    if($obj_query instanceof Csv\Delete){
+	    if($obj_query instanceof Delete){
 	        $arr_wheres = $obj_query->__where;
     	    foreach($arr_data as $arr_row){
     	        if(!$this->validate($arr_row, $arr_wheres, $arr_alias)) {
@@ -320,7 +326,7 @@ class Csv implements Driver {
     	    }
         }
 	    
-	    if($obj_query instanceof Csv\Insert){
+	    if($obj_query instanceof Insert){
             $arr_put = [];
 	        $arr_set = $obj_query->__set;
 	        $id = 0;
@@ -365,7 +371,7 @@ class Csv implements Driver {
      */
     private function fetch(Query $obj_query, bool $boo_headOnly=false)
     {
-        if(!($obj_query instanceof Csv\Select)){
+        if(!($obj_query instanceof Select)){
             trigger_error('Invalid argument, expected Test\Database\Csv\Select', E_USER_ERROR);
         }
 
