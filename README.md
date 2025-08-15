@@ -1,3 +1,11 @@
+# Informationen zur gewählten Lösung
+Benutzte PHP Version ist 7.4
+
+Starten des PHP Development Webservers
+```
+SALT_KEY=your_key_8448 php -S localhost:8000
+```
+
 # Aufgabenstellung
 Erstelle ein Loginformular, in dem Benutzername im E-Mail-Format und ein Passwort abgefragt werden können.
 Implementiere vor dem Absenden eine clientseiteige E-Mail-Formats-Validierung, welche auf eine full-qualified-domain prüft (user@host.domain).
