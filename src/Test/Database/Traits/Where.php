@@ -2,34 +2,45 @@
 namespace Test\Database\Traits;
 
 trait Where {
-    private $arr_where=[];
-    
+    private array $arr_where = [];
+
     /**
-     *    add value to arr_where
-     *    @param string $str_where
+     * add value to arr_where as and
+     *
+     * @param string $str_col
+     * @param string $str_value
+     *
+     * @return Where
      */
-    public function where($str_col, $str_value)
+    public function where(string $str_col, string $str_value): self
     {
         $this->arr_where[] = ['and' => [$str_col => $str_value]];
+
         return $this;
     }
-    
+
     /**
-     *    add value to arr_where
-     *    @param string $str_where
+     * add value to arr_where as or
+     *
+     * @param string $str_col
+     * @param string $str_value
+     *
+     * @return Where
      */
-    public function orWhere($str_col, $str_value)
+    public function orWhere(string $str_col, string $str_value): self
     {
         $this->arr_where[] = ['or' => [$str_col => $str_value]];
+
         return $this;
     }
-    
-    
+
+
     /**
-     *    Returns the arr_where value.
-     *    @return array
+     * Returns the arr_where value
+     *
+     * @return array
      */
-    protected function getWhere()
+    protected function getWhere(): array
     {
         return $this->arr_where;
     }

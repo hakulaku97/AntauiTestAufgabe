@@ -2,23 +2,28 @@
 namespace Test\Database\Traits;
 
 trait From {
-    private $str_from = '';
-    
+    private string $str_from = '';
+
     /**
-    *    Set the str_from value
-    *    @param string $str_from
-    */
-    public function from($str_from)
+     * Set the str_from value
+     *
+     * @param string $str_from
+     *
+     * @return From
+     */
+    public function from(string $str_from): self
     {
         $this->str_from = $str_from;
+
         return $this;
     }
     
     /**
      * Get the str_from value
+     *
      * @return string
      */
-    protected function getFrom()
+    protected function getFrom(): string
     {
         return $this->str_from;
     }
